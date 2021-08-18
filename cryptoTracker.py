@@ -5,22 +5,24 @@ file = urllib.request.urlopen(url)
 url_str = (str(file.read(), 'utf-8'))
 
 values = url_str.split(",")
-crypto_str1 = ""
-crypto_price_str1 = ""
-first_done_id = False
-first_done_price = False
+id_list = []
+price_list = []
+num = 0;
 
 # Prints each separate item in the url
 for item in values:
     print(item)
 
-    # Gets the id and current price of the first cryptocurrency in the URL
-    if "id" in item and first_done_id is False:
-        crypto_str1 = item[7:]
-        first_done_id = not first_done_id
-    if "price" in item and "date" not in item and "time" not in item and first_done_price is False:
-        crypto_price_str1 = item[8:]
-        first_done_price = not first_done_price
+    # Gets the id and current price of the cryptocurrencies in the URL
+    if "id" in item:
+        id_str = item[7:]
+        id_list.append(id_str)
+    if "price" in item and "date" not in item and "time" not in item and "change" not in item:
+        price_str = item[8:]
+        price_list.append(price_str)
 
-print("Current " + crypto_str1 + " price is:")
-print(crypto_price_str1)
+for item in id_list:
+    print("Current " + item + " price is:")
+    print(price_list[num] + " USD")
+    print("\n")
+    num = num+1
