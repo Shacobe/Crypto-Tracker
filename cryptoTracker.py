@@ -1,28 +1,31 @@
-# This program returns the url information from a request for BTC, ETH and XRP cryptocurrency statistics
-import urllib.request
-url = "https://api.nomics.com/v1/currencies/ticker?key=your-key-here&ids=BTC,ETH,XRP&interval=1d,30d&convert=EUR&per-page=100&page=1"
-file = urllib.request.urlopen(url)
-url_str = (str(file.read(), 'utf-8'))
+# This program returns the url information from a request for cryptocurrency statistics
+from requests import Request, Session
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
+import json
 
-values = url_str.split(",")
-id_list = []
-price_list = []
-num = 0;
+# Gets the statistics of the first 5 cryptocurrencies in the latest coinmarketcap listing
+url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+parameters = {
+    'start': '1',
+    'limit': '5',
+    'convert': 'USD'
+}
+headers = {
+    'Accepts': 'application/json',
+    'X-CMC_PRO_API_KEY': 'your-key-here',
+}
 
-# Prints each separate item in the url
-for item in values:
-    print(item)
+# Creates a session which loads the data into json format
+session = Session()
+session.headers.update(headers)
+try:
+    response = session.get(url, params=parameters)
+    data = json.loads(response.text)
 
-    # Gets the id and current price of the cryptocurrencies in the URL
-    if "id" in item:
-        id_str = item[7:]
-        id_list.append(id_str)
-    if "price" in item and "date" not in item and "time" not in item and "change" not in item:
-        price_str = item[8:]
-        price_list.append(price_str)
-
-for item in id_list:
-    print("Current " + item + " price is:")
-    print(price_list[num] + " USD")
-    print("\n")
-    num = num+1
+    # Converts json to string and prints each individual statistic
+    data_str = json.dumps(data)
+    values = data_str.split(",")
+    for item in values:
+        print(item)
+except (ConnectionError, Timeout, TooManyRedirects) as e:
+    print(e)
